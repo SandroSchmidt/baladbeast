@@ -95,10 +95,13 @@ function balad_plot_malen(data){
         stackgroup: 'one', // Enable stacking
         name: key, // Legend name
         type: 'scatter', // Area chart type in Plotly
-        mode: 'none', // No lines or markers, just filled areas
+        mode: 'none',//'line',
+     //   line: {shape: 'spline'}, // No lines or markers, just filled areas
       };
     });
 
+    const currentTime = new Date()//.toISOString();
+    console.log(currentTime)
   // Layout configuration
   const layout = {
     margin:{t:0,b:20,r:0},
@@ -116,7 +119,23 @@ function balad_plot_malen(data){
       y: 1,
       xanchor: 'left',
       yanchor: 'top',
-    }
+    },
+    shapes: [
+      {
+        type: 'line',
+        x0: currentTime,
+        x1: currentTime,
+        y0: 0,
+        y1: 1,
+        xref: 'x',
+        yref: 'paper', // Use 'paper' to scale vertically across the chart
+        line: {
+          color: 'red',
+          width: 1,
+          dash: 'dot', // Make the line dotted
+        },
+      },
+    ],
   };
 
   // Render the chart using Plotly

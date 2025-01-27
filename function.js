@@ -340,7 +340,7 @@ color: col,
 
 }
 
-total_p.text(' total on site: ' + Math.round(total_people_cur))
+total_p.text(' total on site: ' + Math.round(total_people_cur).toLocaleString('en-US'))
 /*
 for (i=0;i<parking_list.length;i++){
 temp = current["parking lot "+ (i+1)].usage
@@ -544,7 +544,7 @@ function initialise_map(){
   redicon = L.icon({  iconUrl: './icons/red.png',  iconSize:     [40, 40],  iconAnchor:   [20, 40]})
   resticon = L.icon({  iconUrl: './icons/restroom.png',  iconSize:     [20, 20],  iconAnchor:   [10, 10]})
 // Karte und Hintergründe
-mymap = L.map('map_div',{zoomSnap: 0.1, dragging: false,minZoom:1,maxZoom:25}).setView([ 21.488048532157524,39.18652961643588],16.3 )
+mymap = L.map('map_div',{zoomSnap: 0.1, dragging: false,minZoom:1,maxZoom:25}).setView([ 21.4883,39.187],17.4 )
 if (overridedisplay9){ mymap.zoomControl.remove();}
 
 // mymap.on('zoomend', function() {setviewzoom = mymap.getZoom()});
