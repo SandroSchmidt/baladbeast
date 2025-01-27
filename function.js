@@ -577,17 +577,14 @@ subdomains: 'abcd',
 
 })
 
-if(overridedisplay9){
-  Jawg_Matrix.addTo(mymap);
-}else{tl1.addTo(mymap)}
 
-//imageUrl ="./24emrgency.svg"
+//imageUrl ="./25memer.png"
 imageUrl ="./map25dreh.svg"
 //const imageBounds = [ [25.013,46.4805],[24.988092848232725, 46.53216767460525]];
 imageBounds = imageBounds = [[ 21.48637, 39.1847],[21.49048, 39.19108]];//
 // [[ 25.00124, 46.49093],[24.99111, 46.5245]];
 
-imageOverlay = L.imageOverlay(imageUrl, imageBounds, { opacity: 1 });
+imageOverlay = L.imageOverlay(imageUrl, imageBounds, { opacity: 1 }).addTo(mymap);
 
 
 
@@ -679,11 +676,11 @@ for (f=0;f<medstations.length;f++) {medstations[f].geo = L.marker(medstations[f]
 medstations[f].geo.addTo(aidstations_layer)}
 for (f=0;f<greening_arr.length;f++) {let fu = f;L.polygon(greening_arr[f].coords, {color: 'green', "weight": 1,"opacity": 0.65, "fillOpacity":0.5 }).bindTooltip(greening_arr[f].name).addTo(green_layer)}
 for (f=0;f<restrooms.length;f++) {L.marker(restrooms[f],{icon:resticon}).addTo(green_layer)}
-for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "red",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
-for (f=0;f<hinter.length;f++)       {let fu = f;L.polygon(hinter[f].coords, {color: 'grey' ,"weight": 2,"fillOpacity": 1}).addTo(green_layer)}
+for (f=0;f<hinter.length;f++)       {let fu = f;L.polygon(hinter[f].coords, {color: 'none' ,"weight": 0,"fillOpacity": 0.7,"fillColor":"grey"}).addTo(green_layer)}
 //for (f=0;f<vib_arr.length;f++)      {let fu = f;L.polygon(vib_arr[f].coords,{fillColor: '#6e737a',fillOpacity:1,color:"black",weight:1}).bindTooltip(vib_arr[f].name).addTo(green_layer)}
 
 // Layercontroll
+for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "red",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
 mymap.addControl(new L.Control.Fullscreen());
     L.control.layers(
       {"CAD": imageOverlay,"dark":Jawg_Matrix ,"light": tl1,"sat":mapboxLayer },
@@ -777,7 +774,7 @@ stages_list[i].geo = f
 }}
 
 for(i=0;i<fluchtrouten.length;i++)
- { for(k=0;k<fluchtrouten[i].length;k++){fluchtrouten[i][k][0] -= 0.00002;fluchtrouten[i][k][1] -= 0.0005}// fluchtrouten[i][o][0] -= 0.00001}
+ { for(k=0;k<fluchtrouten[i].length;k++){fluchtrouten[i][k][0] -= 0.00005;fluchtrouten[i][k][1] -= 0.00055}// fluchtrouten[i][o][0] -= 0.00001}
 
 var polyline = L.polyline(fluchtrouten[i], {
   color: 'red',
