@@ -1,25 +1,84 @@
+// das ier kann icht in data setehen, weil es anch dem array stehen muss
+selected_area = stages_list[0]
+
+function round5min(time){
+const msInFiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  const roundedTime = Math.round(time / msInFiveMinutes) * msInFiveMinutes;
+  console.log(new Date(roundedTime))
+return roundedTime
+}
+
 function read_a_day(jahr,tager){
 console.log("reading a day: year: "+ jahr+ " - day " + tager)
 
-ref = database.ref('/soundstorm/SS'+jahr+'/day'+tager);
+ref = database.ref('/baladbeast/bb'+jahr+'/day'+tager);
 ref.on('value', (snapshot) => {
 daydata = snapshot.val()
+
+
+// hier wurde daydata gelesen und wird jetzt in graphdate convertiert
+
+
+graphdata = {x:[]}
+tabellen_data ={}
+capa_array={}
+// für jede satge werde 
+for(i=0;i<stages_list.length;i++){graphdata[stages_list[i].name] = Array(288).fill('x')
+  graphdata[stages_list[i].name][0]=0
+  graphdata[stages_list[i].name][287]=0
+capa_array[[stages_list[i].name]] =stages_list[i].capacity
+tabellen_data[stages_list[i].name] = Array(288).fill('x')
+tabellen_data[stages_list[i].name][0]=[0,0,0,0]
+  tabellen_data[stages_list[i].name][287]=[0,0,0,0]
+}
+
+for( i = 0;i<(24*60);i += (5)){
+ let temp = (start_graphdata+(i*60000))
+  graphdata.x.push(new Date(temp))
+}
+
+for (const key in daydata){
+  //console.log(stages_list[key])
+ cap = capa_array[key]
+  for(o=0;o<daydata[key].usage.length;o++){
+    timeslot = daydata[key].zeit[o] - start_graphdata
+    timeslot = Math.round(timeslot/(60*1000*5))
+    graphdata[key][timeslot] = cap* daydata[key].usage[o]/100
+    tabellen_data[key][timeslot] = [daydata[key].usage[o],daydata[key].density[o],daydata[key].tension[o] ,(cap* daydata[key].usage[o]/100)]
+  }
+}
+
+for (key in graphdata)
+{
+for (i=0;i<288;i++){
+    if(key != "x" && tabellen_data[key][i] == 'x'){tabellen_data[key][i] = tabellen_data[key][i-1] }
+
+if(graphdata[key][i] == 'x'){graphdata[key][i] = graphdata[key][i-1] }
+
+}}
+
+balad_plot_malen(graphdata)  
+
+  
+//  if(daydata[key].zArray(numZeros).fill(0)t[i]==temp) {graphdata.z[key].push(daydata[key].usage[i]*stages_list[key].capcity/100)}else{graphdata.z[key].push("u")}
+
+
+/*
+for(i=0;i<daydata[key].usage.length;i++){
+   
+   }
 
 graphdata={}
 Object.keys(daydata).forEach((key) => {
 for (k=0;k<stages_list.length;k++){
 if (key == stages_list[k].name){capacity= stages_list[k].capacity}
 }
-
-
 graphdata[key]=make_graphdata_stages(daydata[key],capacity,tager)
 })
-
 sum_onsite = new Array(53)//.fill(0)
 timp =[] 
-
 for(i=0;i<sum_onsite.length;i++){
-
 pq=0
 Object.keys(graphdata).forEach((key) => {
 if(graphdata[key].usage[i] != undefined) {  
@@ -27,18 +86,10 @@ if(sum_onsite[i] == undefined)[sum_onsite[i] =0]
 sum_onsite[i] += (graphdata[key].usage[i]*stages_list[pq].capacity)/100}
 pq++
 })
-
 }      
-
 total_people = {usage:sum_onsite,zeit:graphdata["Big Beast Left"].zeit}
 
-
-
-
-
-refresh()
-
-return graphdata
+*/
 })
 }
 function draw_arrow(){
@@ -72,7 +123,7 @@ if(realtime == true){drawjetzt = new Date().getTime();puffer =0}else{drawjetzt=s
                         polyline.on("click",function(){     swipes_arr[lil].endzeit = drawjetzt
                           polyline.remove()
                           arrowHead.remove()
-                          databaseRef =database.ref('soundstorm/SS24aux/day' + heutag + '/swipes')
+                          databaseRef =database.ref('baladbeast/bb25aux/day' + heutag + '/swipes')
          databaseRef.set(swipes_arr)})
                       
                       }
@@ -95,7 +146,7 @@ measurementId: "G-00674BETEZ"
 firebase.initializeApp(firebaseConfig);
 database = firebase.database();
 deviceversion = 3.1
-databaseRef = database.ref('soundstorm/SS24/Version');
+databaseRef = database.ref('baladbeast/bb25/Version');
 // Read the data once
 databaseRef.once('value')
     .then(snapshot => {
@@ -219,60 +270,58 @@ k++
 }
 function read_current (){
 // ich glaube diese funktion wird nur einmal aufgerufen weil connections zu firebas dann automatisch upgedatet werden
-console.log("reading current...")
+
 database = firebase.database();
 
+// reading swipes:
+      databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/swipes');
+      // Listen for changes in the database
+      databaseRef.on('value', (snapshot) => {
+      if (snapshot.exists()) {
+      swipes_arr = snapshot.val();
+      draw_arrow()
+      } else {
+      console.log("No swipe-data available");
+      }
+    }); 
 
-databaseRef = database.ref('soundstorm/SS24aux/day' + heutag + '/swipes');
-// Listen for changes in the database
-databaseRef.on('value', (snapshot) => {
-if (snapshot.exists()) {
-swipes_arr = snapshot.val();
-draw_arrow()
-} else {
-console.log("No data available");
-}
-}); 
+// reading own locations
+              databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/locations');
+              // Listen for changes in the database
+              databaseRef.on('value', (snapshot) => {
+              if (snapshot.exists()) {
+              eigensymbole_arr= snapshot.val();
 
+              if(eigensymbole_arr.marker == undefined){eigensymbole_arr.marker = []}
+              if(eigensymbole_arr.spotter == undefined){eigensymbole_arr.spotter = []}
 
-databaseRef = database.ref('soundstorm/SS24aux/day' + heutag + '/locations');
-// Listen for changes in the database
-databaseRef.on('value', (snapshot) => {
-if (snapshot.exists()) {
-eigensymbole_arr= snapshot.val();
-
-if(eigensymbole_arr.marker == undefined){eigensymbole_arr.marker = []}
-if(eigensymbole_arr.spotter == undefined){eigensymbole_arr.spotter = []}
-
-console.log(eigensymbole_arr)
-draw_marker()
-} else {
-console.log("No data available");eigensymbole_arr= {marker:[],spotter:[]}
-}
-}); 
-
+              draw_marker()
+              } else {
+              console.log("No data available");eigensymbole_arr= {marker:[],spotter:[]}
+              }
+              }); 
 
 
-
-// Save the initial array to Firebase
-
-
-
-ref = database.ref('/soundstorm/aktuell');
+ref = database.ref('/baladbeast/aktuell');
+/*
 ref.on('value', (snapshot) => {//infotag.text("connected to database!"); 
 {setTimeout(function (){d3.select('#lock').style('background-color',"green")},500)}
 (errorObject) => 
 // This callback will be called if there's an error connecting to the database
 {d3.select('#lock').style('background-color',"yellow")}
 })
-
-
-
+*/
 ref.on('value', (snapshot) => {
+  console.log("änderung in current")
 current = snapshot.val()
+if(current==undefined){console.log('no current data')}
+total_people_cur =0
+
 for(i=0;i<stages_list.length;i++){
-if(current[stages_list[i].name] != undefined){
-temp = current[stages_list[i].name]
+    if(current[stages_list[i].name] != undefined){
+        total_people_cur += ((current[stages_list[i].name].usage/100) *stages_list[i].capacity)
+       let temp = current[stages_list[i].name]
+
 
 let  fcol = farbskala[Math.round(temp.usage/10)]
 
@@ -286,17 +335,14 @@ color: col,
 
 })
 
-/*
-jetzt = new Date()
-jetzte = jetzt.getTime()
-if((jetzte - current[stages_list[i].name].zeit)>(1000*60*45)){
-stages_list[i].geo.setStyle({color:"black",fillColor:"black",opacity:1})
-}
-*/
+
 }
 
 }
-for (i=0;i<7;i++){
+
+total_p.text(' total on site: ' + Math.round(total_people_cur))
+/*
+for (i=0;i<parking_list.length;i++){
 temp = current["parking lot "+ (i+1)].usage
 parking_list.geo[i].setStyle({fillOpacity:temp/100})
 parking_list.tooltip[i].setContent("parking lot "+ (i+1)+ " - " + temp + " %" )
@@ -313,7 +359,7 @@ if(temp > 0.8)
 
 }
 }
-//select_area(set_area)
+*/
 });
 
 
@@ -492,7 +538,11 @@ draw_arrow (swipes_arr[key].von,swipes_arr[key].nach,"green",swipes_arr[key].dic
 
 }
 function initialise_map(){
-
+  medicon = L.icon({  iconUrl: './icons/medicon.png', iconSize:     [20, 20], });
+  mediconring = L.icon({  iconUrl: './icons/mediconring.png', iconSize:     [20, 20], });
+  greenicon = L.icon({  iconUrl: './icons/green.png',  iconSize:     [40, 40],  iconAnchor:   [20, 40]})
+  redicon = L.icon({  iconUrl: './icons/red.png',  iconSize:     [40, 40],  iconAnchor:   [20, 40]})
+  resticon = L.icon({  iconUrl: './icons/restroom.png',  iconSize:     [20, 20],  iconAnchor:   [10, 10]})
 // Karte und Hintergründe
 mymap = L.map('map_div',{zoomSnap: 0.1, dragging: false,minZoom:1,maxZoom:25}).setView([ 21.488048532157524,39.18652961643588],16.3 )
 if (overridedisplay9){ mymap.zoomControl.remove();}
@@ -531,14 +581,22 @@ if(overridedisplay9){
   Jawg_Matrix.addTo(mymap);
 }else{tl1.addTo(mymap)}
 
-imageUrl ="./bb25bild dreh.svg"
+//imageUrl ="./24emrgency.svg"
+imageUrl ="./map25dreh.svg"
+//const imageBounds = [ [25.013,46.4805],[24.988092848232725, 46.53216767460525]];
+imageBounds = imageBounds = [[ 21.48637, 39.1847],[21.49048, 39.19108]];//
+// [[ 25.00124, 46.49093],[24.99111, 46.5245]];
 
-imageOverlay = L.imageOverlay(imageUrl, imageBounds, { opacity: 0.6 });
+imageOverlay = L.imageOverlay(imageUrl, imageBounds, { opacity: 1 });
+
+
+
+
+
 
 
 
 //const imageUrl = './map1.png';
-//const imageBounds = [ [25.013,46.4805],[24.988092848232725, 46.53216767460525]];
 
 /*
 
@@ -562,25 +620,9 @@ parkinglot_layer = L.layerGroup().addTo(mymap)
 zones_layer = L.layerGroup()
 back_layer = L.layerGroup().addTo(mymap)
 aidstations_layer = L.layerGroup().addTo(mymap)
+flucht_layer = L.layerGroup()
 
-
-setTimeout(() => {
-  if((set_name == "sandro" || set_name == "demo") && overridereport != true){
-  
-    mymap.dragging.enable();
-    mymap.touchZoom.enable();
-    mymap.doubleClickZoom.enable();
-    mymap.scrollWheelZoom.enable();
-    
-    // Remove the touch event listeners using D3
-    d3.select(mymap.getContainer())
-      .on("touchstart", null)
-      .on("touchend", null);
-    
-      console.log("drag anstelle von swipe")
-    }
-      
-}, 1000);
+set_swipemode()
 
 
 
@@ -637,20 +679,18 @@ for (f=0;f<medstations.length;f++) {medstations[f].geo = L.marker(medstations[f]
 medstations[f].geo.addTo(aidstations_layer)}
 for (f=0;f<greening_arr.length;f++) {let fu = f;L.polygon(greening_arr[f].coords, {color: 'green', "weight": 1,"opacity": 0.65, "fillOpacity":0.5 }).bindTooltip(greening_arr[f].name).addTo(green_layer)}
 for (f=0;f<restrooms.length;f++) {L.marker(restrooms[f],{icon:resticon}).addTo(green_layer)}
-for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "#748cad",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
-
-for (f=0;f<hinter.length;f++)       {let fu = f;L.polygon(hinter[f], {color: 'grey' ,"weight": 2,"fillOpacity": 0.65}).addTo(green_layer)}
-for (f=0;f<vib_arr.length;f++)      {let fu = f;L.polygon(vib_arr[f].coords,{fillColor: '#6e737a',fillOpacity:1,color:"black",weight:1}).bindTooltip(vib_arr[f].name).addTo(green_layer)}
+for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "red",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
+for (f=0;f<hinter.length;f++)       {let fu = f;L.polygon(hinter[f].coords, {color: 'grey' ,"weight": 2,"fillOpacity": 1}).addTo(green_layer)}
+//for (f=0;f<vib_arr.length;f++)      {let fu = f;L.polygon(vib_arr[f].coords,{fillColor: '#6e737a',fillOpacity:1,color:"black",weight:1}).bindTooltip(vib_arr[f].name).addTo(green_layer)}
 
 // Layercontroll
-if(!overridedisplay9)
-  {mymap.addControl(new L.Control.Fullscreen());
+mymap.addControl(new L.Control.Fullscreen());
     L.control.layers(
-      {"dark":Jawg_Matrix ,"light": tl1,"sat":mapboxLayer },
-      {"img": imageOverlay,"stages":stages_layer,"blocks":green_layer,"spotter+marker":eigensymbole_layer,"crowdflow" :movement_layer,
-    "medical":aidstations_layer}).addTo(mymap);
+      {"CAD": imageOverlay,"dark":Jawg_Matrix ,"light": tl1,"sat":mapboxLayer },
+      {"stages":stages_layer,"blocks":green_layer,"spotter+marker":eigensymbole_layer,"crowdflow" :movement_layer,
+    "medical":aidstations_layer,"Emergency routes":flucht_layer}).addTo(mymap);
       
-  }
+  
   //  "parking lots":parkinglot_layer,"op-zones":zones_layer
   
 
@@ -670,7 +710,7 @@ jetzt = new Date()
     userInput = prompt('describe marker:', '')
     if (userInput !== null) {
       randomNum = Math.floor(Math.random() * 9999) + 1;
-    databaseRef = database.ref('soundstorm/SS24aux/day' + heutag + '/locations/marker');
+    databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/locations/marker');
       eigensymbole_arr.marker.push({
       ort: [e.latlng.lat, e.latlng.lng],
       text: userInput,
@@ -697,12 +737,7 @@ jetzt = new Date()
 }
 }}
 )
-mymap.getContainer().addEventListener("touchstart", function (e) {
 
-touchStartX = e.touches[0].clientX;
-touchStartY = e.touches[0].clientY;
-start_time = new Date()
-})
 
 mymap.on('zoomlevelschange', function () {
 // This event is triggered when the zoom level changes (e.g., button press)
@@ -723,43 +758,7 @@ isZooming = false;
 
 
 // hier werden die swipes aufgenommen und gespeichert in der firebase  
-mymap.getContainer().addEventListener("touchend", function (e) {
-  if(!isZooming ){
-    touchEndX = e.changedTouches[0].clientX;
-    touchEndY = e.changedTouches[0].clientY;
-    ort1 = mymap.containerPointToLatLng([touchStartX,touchStartY]);
-    ort2 = mymap.containerPointToLatLng([touchEndX,touchEndY]);
 
-    minmove = 0.0002
-    maxmove = 0.002
-    move = Math.abs(ort1.lat - ort2.lat) + Math.abs(ort1.lng - ort2.lng)
-    end_date = new Date()   
-    diff = Math.ceil((end_date.getTime()-start_time.getTime())/500)
-    www = 5*diff
- 
-    if(move> minmove && move <maxmove && diff < 4){ 
-
-      if (locked || deviceversion != fireversion || set_name == "demo" || set_name == "sandro") {
-        infotag.text('can not send swipes when -LOCKED-')
-        console.log("swipe while locked")
-        return;
-        }
-        else{
-       
-          ntemp = new Date()
-          ntemp = ntemp.getTime()
-          newEntry ={meldender:set_name,von:ort1, nach:ort2,zeit:parseInt(ntemp),endzeit:ntemp + (1000*60*5),dicke:www}
-          swipes_arr.push(newEntry); // Add new entry to the array
-      
-          databaseRef =database.ref('soundstorm/SS24aux/day' + heutag + '/swipes')
-          databaseRef.set(swipes_arr)
-
-          infotag.text("swipe reported. category:   "+ www/5)
-  
-          }
-    }
-  }
-})
 
 // Bühnen einmalen
 stages_geo=[]
@@ -777,7 +776,36 @@ select_area(zi)
 stages_list[i].geo = f
 }}
 
+for(i=0;i<fluchtrouten.length;i++)
+ { for(k=0;k<fluchtrouten[i].length;k++){fluchtrouten[i][k][0] -= 0.00002;fluchtrouten[i][k][1] -= 0.0005}// fluchtrouten[i][o][0] -= 0.00001}
 
+var polyline = L.polyline(fluchtrouten[i], {
+  color: 'red',
+  weight: 1,
+  opacity: 0.7,
+  dash: [0,5]
+}).addTo(flucht_layer);
+
+// Add arrows to the polyline using PolylineDecorator
+var decorator = L.polylineDecorator(polyline, {
+  patterns: [
+      {
+          offset: '0', // Start offset
+          repeat: '15', // Space between arrows
+          symbol: L.Symbol.arrowHead({
+              pixelSize: 5,
+              polygon: true,
+              pathOptions: {
+                  stroke: true,
+                  color: 'red',
+                  weight: 1,
+               //   opacity: 1
+              }
+          })
+      }
+  ]
+}).addTo(flucht_layer);
+}
 
 }
 function interpolateUndefined(arr) {
@@ -1076,29 +1104,29 @@ if (usage[i] !== undefined && usage[i] !== null && usage[i] !== '') {
 }
 }
 
-// If all entries are empty, return an empty object or handle accordingly
 return { zeit: [], usage: [] };
 }
 function writeReportToFirebase() {
-  
-
+  jetzt = new Date()
   d3.select('#lock').style('background-color',"yellow")
-  
+ 
   if (locked || set_name == "demo" || deviceversion != fireversion) {
     infotag.text('can not send reports or swipes when -LOCKED-')
     return;
   }else{
-const database = firebase.database();
 
-  databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("zeit");
+const database = firebase.database();
+console.log("----- " + heutag)
+
+  databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("zeit");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
-              currentArray.push(jetzt.getTime()); //!!!!!!!!!!!!!!!!!!!!!!!! das hier ist fingiert für demo
+              currentArray.push(jetzt.getTime()); 
               
         return currentArray;
              });
       
-  databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("usage");
+  databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("usage");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
              currentArray.push(parseInt(set_usage));
@@ -1106,25 +1134,25 @@ const database = firebase.database();
               return currentArray;
              });
 
-             databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("tension");
+             databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("tension");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
              currentArray.push(parseInt(set_tens));
               return currentArray;
              });
-             databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("density");
+             databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("density");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
              currentArray.push(parseInt(set_dens));
               return currentArray;
              });
-             databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("meldender");
+             databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("meldender");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
              currentArray.push(set_name);
               return currentArray;
              });
-             databaseRef = database.ref('soundstorm/SS24/day'+heutag).child(stages_list[set_area].name).child("position");
+             databaseRef = database.ref('baladbeast/bb25/day'+heutag).child(stages_list[set_area].name).child("position");
               databaseRef.transaction(function(currentArray) {
               currentArray = currentArray || [];
              currentArray.push(set_pos);
@@ -1134,41 +1162,14 @@ const database = firebase.database();
 
 
 
-             //if (infotag) infotag.text("report sent");
-
- 
-
   
+console.log(set_area)
 
-/*
-
-     // Push the data to the database
-      databaseRef.push(dataToWrite)
-        .then(() => {
-          console.log("Data was successfully written to the Firebase database.");
-        })
-        .catch((error) => {
-          console.error("Error writing data to the Firebase database:", error);
-          infotag.text("no connection!!")
-        });
-
-        d3.select('#infotag').text('status: report sent at '+ jetzt.getHours()+":"+jetzt.getMinutes()+":"+jetzt.getSeconds())
-*/
-        // hier wird versucht zusätzlich einen report über die aktuelle alge zusammenzustellen
-
-       
-        databaseRef = database.ref('soundstorm').child('aktuell').child(stages_list[set_area].name);
+       databaseRef = database.ref('baladbeast').child('aktuell').child(stages_list[set_area].name);
         databaseRef.set({zeit:jetzt.getTime(), density: set_dens, tension: set_tens,  usage: set_usage})
 
       }
-    }
-
-
-    setTimeout(function() {
-      mymap.invalidateSize();
-  }, 500);
-
-
+}
 function draw_marker(){
   eigensymbole_layer.clearLayers()
   if(realtime == true){drawjetzt = new Date().getTime();puffer =0}else{drawjetzt=settim;puffer = (1000*60*7)}
@@ -1192,7 +1193,7 @@ for(let ip=0;ip<eigensymbole_arr.marker.length;ip++)
                   //    eigensymbole_arr.marker[ip].zeige = false
                      eigensymbole_arr.marker[ip].endzeit = drawjetzt
                     //console.log(eigensymbole_arr)
-                    databaseRef = database.ref('soundstorm/SS24aux/day' + heutag + '/locations/marker');
+                    databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/locations/marker');
                     databaseRef.set(eigensymbole_arr.marker)
                   })}
                 
@@ -1214,36 +1215,6 @@ for(let ip=0;ip<eigensymbole_arr.marker.length;ip++)
 
 
 }
-
-
-
-
-  /*
-ww =[]
-for (f=0;f< zones_arr.length;f++){
-
-  ww.push({name:zones_arr[f][0],color:zones_arr[f][1],coords:polystrtoco(zones_arr[f][2]) })
-
-}
-
-
-
-function polystrtoco (d){
-  ///                                       --------------- mit dieser funktion werden die polygon strings in coordinaten umgewandelt
-  d = d.slice(8)
-  d = d.slice(0,-1)
-  d = d.split(", ")
-  for (i=0;i<d.length;i++){d[i] = d[i].split(" ")}
-  for (i=0;i<d.length;i++){d[i]=[  d[i][1]*yauslpp +25.0074,  d[i][0]*xauslpp +46.49160088116361 ]}
-  return d
-  }
-
-xauslpp =   (46.513899054271185-46.49160088116361  )/508.48//574
-yauslpp = -   (24.99899094193483- 24.995559147406844)/86.33//113
-// events
-
-
-*/
 function getTimeOfDay(milliseconds) {
   const date = new Date(milliseconds);
   const hours = date.getHours().toString().padStart(2, '0');
@@ -1252,5 +1223,68 @@ function getTimeOfDay(milliseconds) {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+function set_swipemode(){
+  if(swipemode){
+    console.log("swipemodus an")
+    mymap.dragging.disable();
+    mymap.touchZoom.disable();
+    d3.select(mymap.getContainer())
+          .on("touchstart", function(e){
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      start_time = new Date()})
+          .on("touchend", function(e){
+             if(!isZooming ){
+          touchEndX = e.changedTouches[0].clientX;
+          touchEndY = e.changedTouches[0].clientY;
+          ort1 = mymap.containerPointToLatLng([touchStartX,touchStartY]);
+          ort2 = mymap.containerPointToLatLng([touchEndX,touchEndY]);
+      
+          minmove = 0.0002
+          maxmove = 0.002
+          move = Math.abs(ort1.lat - ort2.lat) + Math.abs(ort1.lng - ort2.lng)
+          end_date = new Date()   
+          diff = Math.ceil((end_date.getTime()-start_time.getTime())/500)
+          www = 5*diff
+       
+          if(move> minmove && move <maxmove && diff < 4){ 
+      
+            if (locked || deviceversion != fireversion) {
+              infotag.text('can not send swipes when -LOCKED-')
+              console.log("swipe while locked")
+              return;
+              }
+              else{
+             
+                ntemp = new Date()
+                ntemp = ntemp.getTime()
+                newEntry ={meldender:set_name,von:ort1, nach:ort2,zeit:parseInt(ntemp),endzeit:ntemp + (1000*60*5),dicke:www}
+                swipes_arr.push(newEntry); // Add new entry to the array
+            
+                databaseRef =database.ref('baladbeast/bb25aux/day' + heutag + '/swipes')
+                databaseRef.set(swipes_arr)
+      
+                infotag.text("swipe reported. category:   "+ www/5)
+              }}
+  }});
 
-// Version
+  }else{
+
+      
+        mymap.dragging.enable();
+        mymap.touchZoom.enable();
+        mymap.doubleClickZoom.enable();
+        mymap.scrollWheelZoom.enable();
+        
+        // Remove the touch event listeners using D3
+        d3.select(mymap.getContainer())
+          .on("touchstart", null)
+          .on("touchend", null);
+        
+          console.log("drag anstelle von swipe")
+  
+}}
+// TODO: das hier ist irgendwie wichtig wegen der veränderung der map-fanster. wenn man das raus nimmt wird die map nicht richtig gerendert:
+setTimeout(function() {
+  mymap.invalidateSize();
+}, 500);

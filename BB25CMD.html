@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <title>SS24 - start right (tm)</title>
+    <title>BB25 - cr main</title>
     <script src="./js/d3.min.js"></script>
     <script src="./js/plotly-2.16.1.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
@@ -30,7 +30,7 @@
 
   <div id="lio_div" style="float:left;width:50%;height:60%;"><div id="map_div" style="width:100%;height: 100%"></div></div>
   <div id="reo_div" style="float:left;width:40%;height:60%;text-align: center;">
-  <img src="./logo.png" style="width: 30%" onclick="selected_area.id =99; make_cul_graph()">
+  <img src="./logo.png" style="width: 60%" ><br>
   <!--  <img src=".//safe_events_logo-1.png" style="width: 30%" id ="evtlog" onclick="d3.select('#evtlog').remove()" >
   -->
   </div>
@@ -55,7 +55,7 @@
 
   </body>
   <script>
-   /*  Diese 4 Zeilen sind für den Fall, dass man das Bild im Hintergrund nochmal zerren muss, dazu sind die number.inputs aus einzukommentieren
+    /*  Diese 4 Zeilen sind für den Fall, dass man das Bild im Hintergrund nochmal zerren muss, dazu sind die number.inputs aus einzukommentieren
   d3.select('#imgstr1').attr("value",imageBounds[0][0])
   d3.select('#imgstr2').attr("value",imageBounds[0][1])
   d3.select('#imgstr3').attr("value",imageBounds[1][0])
@@ -67,6 +67,10 @@
   initialise_map()
   initialise_settings()
   initialise_firebase()
+  read_current()
+  read_a_day(25,heutag)
+
+  /*
   database = firebase.database();
   ref = database.ref('/soundstorm/SS24aux/day'+heutag+'/camcounts/');
   ref.on('value', (snapshot) => {
@@ -74,19 +78,224 @@
   count_datain = make_graphdata({usage:count_data.IN,zeit:count_data.zeit})
   count_dataout = make_graphdata({usage:count_data.OUT,zeit:count_data.zeit})
   })
+*/
 
 
-  read_current()
-  daydata = read_a_day(24,heutag)
+function balad_plot_malen(data){
+  // Extract x-axis values (timestamps)
+  const xValues = data.x;
 
-  setTimeout(function(){total_people},3000)
-  /*
-  setInterval(function (){refresh()},180000)
-  ref.on('value', (snapshot) => {
-  current = snapshot.val()
-  for(i=0;i<stages_list.length;i++){
-  if(current[stages_list[i].name] != undefined){
-  */
+  // Prepare the traces for each area
+  const traces = Object.keys(data)
+    .filter((key) => key !== 'x') // Exclude the x-axis values
+    .map((key) => {
+      return {
+        x: xValues,
+        y: data[key],
+        stackgroup: 'one', // Enable stacking
+        name: key, // Legend name
+        type: 'scatter', // Area chart type in Plotly
+        mode: 'none', // No lines or markers, just filled areas
+      };
+    });
+
+  // Layout configuration
+  const layout = {
+    margin:{t:0,b:20,r:0},
+   // title: 'Stacked Area Chart',
+    xaxis: {
+     // title: 'Timestamp',
+      type: 'date', // Format x-axis as dates
+    },
+    yaxis: {
+      title: 'patrons on site',
+    },
+    showlegend: false, // Show legend
+    legend: {
+      x: 0,
+      y: 1,
+      xanchor: 'left',
+      yanchor: 'top',
+    }
+  };
+
+  // Render the chart using Plotly
+  Plotly.newPlot("liu_div", traces, layout,{displayModeBar:false});
+}
+
+
+/*
+
+data=[]
+
+
+  
+data.push(
+{
+x:  filteredData.zeit, //neu graph_data[selected_area.id].data_time,
+y:  filteredData.usage, //neu graph_data[selected_area.id].data,
+
+yaxis:"y1",
+mode: 'lines',   fill: 'tozeroy',
+
+name: "count on site",
+line: {shape: 'spline',color: "steelblue"},
+type: 'scatter'  
+})
+data.push(
+{
+x:  graphdata["Big Beast Left"].zeit, //neu graph_data[selected_area.id].data_time,
+y:  referens_daten.usage, //neu graph_data[selected_area.id].data,
+
+yaxis:"y1",
+
+
+mode: 'lines',
+name: "Day 2 - 2023",
+line: {shape: 'spline',color:"black",dash: 'dashdot'},
+type: 'scatter'    })
+crsum_arr =addArrays(count_data.IN,count_data.OUT)
+data.push(
+{ x: count_data.zeit,
+y: crsum_arr,
+mode: 'lines',
+
+name: "crowd count total",
+line: {shape: 'spline',color:"green"},
+type: 'scatter'    }
+)
+// hier die steigungen eingeben
+
+hund = settim.getTime()
+hund += (60*60*1000*2)
+hund = new Date(hund)
+hund2 = settim.getTime()
+hund2 -= (60*60*1000)
+hund2 = new Date(hund2)
+
+//hund3 = count_data.zeit[]
+//hund4 = count_data.zeit
+gr_layout.shapes.push(  {
+          type: 'line',
+          x0:  progres.zeit[0],/////hund2,
+          y0: progres.usage[0],//total_people.usage[settim_slot-4],
+          x1: progres.zeit[1],
+          y1: progres.usage[1],
+          name: "progression",
+          line: {
+          color: "green",
+          dash: 'dashdot',
+          width: 1.5
+          }} )
+          gr_layout.shapes.push(  {
+          type: 'line',
+          x0:  progres2.zeit[0],/////hund2,
+          y0: progres2.usage[0],//total_people.usage[settim_slot-4],
+          x1: progres2.zeit[1],
+          y1: progres2.usage[1],
+          name: "progression",
+          line: {
+          color: "green",
+          dash: 'dashdot',
+          width: 1.5
+          }} )
+          gr_layout.shapes.push(  {
+          type: 'line',
+          x0:  progres3.zeit[0],/////hund2,
+          y0: progres3.usage[0],//total_people.usage[settim_slot-4],
+          x1: progres3.zeit[1],
+          y1: progres3.usage[1],
+          name: "progression",
+          line: {
+          color: "green",
+          dash: 'dashdot',
+          width: 1.5
+          }} )
+
+gr_layout.shapes.push(  {
+          type: 'line',
+          x0: hund2,
+          y0: crsum_arr[settim_slot-4],
+          x1: hund,
+          y1: crsum_arr[settim_slot]+3*(crsum_arr[settim_slot]),//*ruckschau,
+          name: "progression2",
+          line: {
+          color: "green",
+          dash: 'dashdot',
+          width: 1
+          }} )
+}
+if(welcher_plot=="camcounts"){
+
+
+
+data.push(
+{ x: count_data.zeit,
+y: addArrays(count_data.IN,count_data.OUT),
+mode: 'lines',
+
+name: "crowd count total",
+line: {shape: 'spline',color:"green"},
+type: 'scatter'    }
+)
+
+data.push({
+x:  count_datain.zeit, //neu graph_data[selected_area.id].data_time,
+y:   addArrays(count_data.IN,count_data.OUT), //neu graph_data[selected_area.id].data,
+
+yaxis:"y1",
+mode: 'lines',
+//   fill: 'tonexty',
+name: "SUM",
+line: {shape: 'spline'},
+type: 'scatter' 
+
+
+},
+{
+x:  count_datain.zeit, //neu graph_data[selected_area.id].data_time,
+y:  count_datain.usage, //neu graph_data[selected_area.id].data,
+
+yaxis:"y1",
+mode: 'lines',
+//   fill: 'tonexty',
+name: "IN",
+line: {shape: 'spline'},
+type: 'scatter'  
+},   {
+x:  count_dataout.zeit, //neu graph_data[selected_area.id].data_time,
+y:  count_dataout.usage, //neu graph_data[selected_area.id].data,
+
+yaxis:"y1",
+mode: 'lines',
+// fill: 'tonexty',
+name: "OUT",
+line: {shape: 'spline'},
+type: 'scatter'  
+})
+}
+
+
+        
+
+
+
+
+
+
+
+
+Plotly.newPlot('liu_div', data,gr_layout,{
+  //displayModeBar: false, // this is the line that hides the bar.
+})
+//ply = document.getElementById('liu_div')
+  
+*/
+
+
+
+
+  
   function jetzt_plot_malen(welcher_plot){
 
 
@@ -283,6 +492,7 @@
 
   }
   function initialise_settings(){
+    // dies hier sind nur die plot-settings, daher sind sie auch in der main biew html und nicht in settigs.js
   ruckschau = 2
   show_event = false
   show_tensdens = false
@@ -306,23 +516,24 @@
   // reu =  d3.select('#reu_div').style('width',fenster.breite*(1-layout)+"px").style('height',fenster.hoehe*0.45+"px")
 
   reo.append('br')
-  tidi = reo.append('span').style('margin','auto').text('DAY 1 - Time 10:15').style("font-size", "3vh").style("font-weight",700)
-  .on('click',function (){nowbutton()}).style('cursor', 'pointer')
 
+  tidi = reo.append('span').style('margin','auto').text('Balad Beast 25 - DAY 99 - Time 99:99').style("font-size", "3vh").style("font-weight",700)
+  //.on('click',function (){nowbutton()}).style('cursor', 'pointer')
   reo.append('br')
+ 
   tabero = reo.append('table').style('width',"100%").style('margin','auto').style('width','95%').style('margin-top',"5px")//.style("font-size", "5px")
   temp = tabero.append('tr').style('background-color',"grey")
   //temp.append("th").text("no.")
-  temp.append("th").text("stage").style('width',"30%")
+  temp.append("th").text("area").style('width',"30%")
   temp.append("th").text("usage").style('width',"17%")
 
   temp.append("th").text("density").style('width',"17%")
   temp.append("th").text("tension").style('width',"17%")
+  temp.append("th").text("capacity").style('width',"17%")
   temp.append("th").text("people").style('width',"17%")
   tuc =[]
-  ttc = [      ]
+  ttc = []
   tpc =[]
-
   tdc=[]
   butarr=[]
 
@@ -341,50 +552,53 @@ if(stages_list[i].name != "Playground")
 
   tdc.push(temp.append("td").text("d"+i).style("font-weight",700))
   ttc.push(temp.append("td").text("t"+i).style("font-weight",700))
+  temp.append("td").text(stages_list[i].capacity).style("font-weight",700)
   tpc.push(temp.append("td").text("p"+i).style("font-weight",700))
   }}
+  /* 
   tpc[5].style('color',"white")
   tpc[13].style('color',"white")
   tpc[14].style('color',"white")
   tpc[12].style('color',"white")
-  /*    
+     
   tuc[14].style('color',"white")
   tuc[14].style('color',"white")
   ttc[14].style('color',"white")
   tpc[14].style('color',"white")
   */
 
+
+  // zweite tabelle die wir bei soundstorm immer genutzt haben
+  /*
+  
   reo.append('br')
-  tabero2 = reo.append('table').style('width',"100%").style('margin','auto').style('width','95%')//.style('margin-top',"5px")
+                        tabero2 = reo.append('table').style('width',"100%").style('margin','auto').style('width','95%')//.style('margin-top',"5px")
+                        temp2 = tabero2.append('tr')
+                        temp2.append("th").text("in-counts").style("width","19%").style('background-color',"grey").on('click',function(){
+                          jetzt_plot_malen("camcounts")
+                        })
+                        field_inc = temp2.append("td").text("000").style("width","15%")
+                        temp2.append("th").text("out-counts").style("width","19%").style('background-color',"grey")
+                        field_outc =temp2.append("td").text("000").style("width","15%")
+                        temp2.append("th").text("count-diff").style("width","19%").style('background-color',"grey")
+                        field_difc =temp2.append("td").text("000").style("width","15%")
+                        temp2 = tabero2.append('tr')
+                        temp2.append("th").text("scans").style("width","19%").style('background-color',"grey")
+                        field_sca = temp2.append("td").text("-").style("width","15%")
+                        temp2.append("th").text("on site").style("width","19%").style('background-color',"grey").on('click',function(){
+                        jetzt_plot_malen("general") 
+                        }
+                        )
 
-  temp2 = tabero2.append('tr')
+                        field_onsite = temp2.append("td").text("000").style("width","15%")
+                        temp2.append("th").text("peak rate").style("width","19%").style('background-color',"grey")
+                        //field_rate = 
+                        temp2.append("td").text("-").style("width","15%")
+*/
 
-  temp2.append("th").text("in-counts").style("width","19%").style('background-color',"grey").on('click',function(){
-    jetzt_plot_malen("camcounts")
-
-
-  })
-  field_inc = temp2.append("td").text("000").style("width","15%")
-  temp2.append("th").text("out-counts").style("width","19%").style('background-color',"grey")
-  field_outc =temp2.append("td").text("000").style("width","15%")
-  temp2.append("th").text("count-diff").style("width","19%").style('background-color',"grey")
-  field_difc =temp2.append("td").text("000").style("width","15%")
-
-  temp2 = tabero2.append('tr')
-  temp2.append("th").text("scans").style("width","19%").style('background-color',"grey")
-  field_sca = temp2.append("td").text("-").style("width","15%")
-  temp2.append("th").text("on site").style("width","19%").style('background-color',"grey").on('click',function(){
-  jetzt_plot_malen("general") 
-  }
-  )
-
-  field_onsite = temp2.append("td").text("000").style("width","15%")
-  temp2.append("th").text("peak rate").style("width","19%").style('background-color',"grey")
-  //field_rate = 
-  temp2.append("td").text("-").style("width","15%")
-
-
-  slider =  d3.select('#katze').append('input').attr('type','range').style('width',"96%").style('height',"3%").style('margin','auto').style('display', 'block')
+reo.append('p').attr('id','total_p').text("count on site: " + 99999).style("font-weight",700)
+total_p = d3.select('#total_p')
+slider =  d3.select('#katze').append('input').attr('type','range').style('width',"96%").style('height',"3%").style('margin','auto').style('display', 'block')
   .attr("id","timeslider").attr('max',graphbreiteinviertelstunden).attr('min',0).attr('step',1).on('change',
 
     function(){
@@ -399,7 +613,7 @@ console.log(settim_slot)
 
         refresh();})
 
-
+/*
   but_div = d3.select('body').append('div')//.style("position", "absolute").style("bottom", "35px")
   but_div.append('br')
     
@@ -429,61 +643,28 @@ console.log(settim_slot)
   })
 
   but_div.append('br')
-
+*/
 
   }
+
   function refresh(){
     if (realtime == true){settim = new Date()}
     temp = settim.getTime()
-  for ( i=0 ;i<graphdata["Big Beast Left"].zeit.length-1;i++){
-  if(temp >= graphdata["Big Beast Left"].zeit[i] &&temp < graphdata["Big Beast Left"].zeit[i+1]){
-  settim_slot = i
-  }
-  }
   currentTimestamp = settim
-    draw_arrow()
+  draw_arrow()
   draw_marker()
-  console.log(settim)
-  console.log(settim_slot)
-  slider.property("value",settim_slot)
+  //slider.property("value",settim_slot)
 
 //hier gehts weiter
-    for(i=0;i<stages_list.length;i++){
-                  if(graphdata[stages_list[i].name] != undefined){
-                    temp = graphdata[stages_list[i].name]
-                    let  fcol = farbskala[Math.round(temp.usage[settim_slot]/10)]
-                    let col = farbskala[Math.min(10,Math.round(temp.density[settim_slot])*2)]
-
-
-//if(current[stages_list[i].name].zeit < settim.getTime()-60*1000*10){fcol="grey";console.log("asdnkandlasbdlasbdlkjfkjbfdkjbgkjdfbs")}
-console.log(current[stages_list[i].name].zeit + "fsdfsdf")
-console.log(settim.getTime()-60*1000*10)
-
-                  if(Math.min(10,Math.round(temp.density[settim_slot])*2) > 0  )
-                  {  stages_list[i].geo.setStyle({
-                    //   opacity:1,
-                        fillOpacity:0.6,
-                        fillColor: fcol,
-                        color: col,
-                        "weight": 3
-                  })}
-                  }
-  }
-
-
-
-  
-
-
-  field_inc.text(Math.round(count_datain.usage[settim_slot]).toLocaleString('en-US'))
-  field_outc.text(Math.round(count_dataout.usage[settim_slot]).toLocaleString('en-US'))
-  field_difc.text(Math.round(count_datain.usage[settim_slot]-count_dataout.usage[settim_slot]).toLocaleString('en-US'))
-  field_onsite.text(Math.round(total_people.usage[settim_slot]).toLocaleString('en-US'))
 
   drecks=""
   if(settim.getMinutes()<10){drecks = "0"}
-  tidi.text('DAY '+heutag+' - Time ' +settim.getHours() +":"+drecks+settim.getMinutes())
+  tidi.text('Balad Beast 25 - DAY '+heutag+' - Time ' +settim.getHours() +":"+drecks+settim.getMinutes())
 
+  settim_slot = temp - start_graphdata
+    settim_slot = Math.round(settim_slot/(60*1000*5))
+
+  console.log(tuc)
   q=0
   Object.keys(graphdata).forEach((key) => {
   //tempart = current[stages_list[q].name]
@@ -512,41 +693,44 @@ console.log(settim.getTime()-60*1000*10)
 
 
   */
-if(key != "Playground")
+if(key != "x")
 
 {
-  if (Math.round(graphdata[key].usage[settim_slot]) == NaN){alert(graphdata[key].usage[settim_slot])}
+  if (Math.round(tabellen_data[key][settim_slot][0]) == NaN){alert(tabellen_data[key][settim_slot][0])}
   pfeil =" ◄"
-  if(graphdata[key].usage[settim_slot]>graphdata[key].usage[settim_slot-1]){pfeil = " ▲"}
-  if((graphdata[key].usage[settim_slot])<graphdata[key].usage[settim_slot-1]){pfeil =" ▼" }
+  if(tabellen_data[key][settim_slot][0]>tabellen_data[key][settim_slot-1][0]){pfeil = " ▲"}
+  if((tabellen_data[key][settim_slot][0])<tabellen_data[key][settim_slot-1][0]){pfeil =" ▼" }
 
-  tuc[q].text(Math.round(graphdata[key].usage[settim_slot])+ " %" +pfeil) //*(stages_list[q].capacity/100)))
-  tuc[q].style('background-color',farbskala[Math.round(graphdata[key].usage[settim_slot]/10)]
+  tuc[q].text(Math.round(tabellen_data[key][settim_slot][0])+ " %" +pfeil) //*(stages_list[q].capacity/100)))
+  tuc[q].style('background-color',farbskala[Math.round(tabellen_data[key][settim_slot][0]/10)]
 
-  //farbskala[(10,Math.round(graphdata[key].usage[settim_slot]/10))]
+  //farbskala[(10,Math.round(tabellen_data[key][0].usage[settim_slot]/10))]
   )
-  if(isNaN(graphdata[key].usage[settim_slot])){tuc[q].text("")}
+  if(isNaN(tabellen_data[key][settim_slot][0])){tuc[q].text("")}
   // ficko
+
+  
   pfeil =" ◄"
-  if(graphdata[key].density[settim_slot]>graphdata[key].density[settim_slot-1]){pfeil =" ▲"}
-  if(graphdata[key].density[settim_slot]<graphdata[key].density[settim_slot-1]){pfeil = " ▼" }
-  tdc[q].text(Math.round(graphdata[key].density[settim_slot]) +pfeil)
-  tdc[q].style('background-color',farbskala[Math.min(10,Math.round(graphdata[key].density[settim_slot])*2)]
-  //farbskala[Math.min(10,Math.round(graphdata[key].density[settim_slot]*2))]
+  if(tabellen_data[key][settim_slot][1]>graphdata[key][settim_slot-1][1]){pfeil =" ▲"}
+  if(tabellen_data[key][settim_slot][1]<graphdata[key][settim_slot-1][1]){pfeil = " ▼" }
+  tdc[q].text(Math.round(tabellen_data[key][settim_slot][1]) +pfeil)
+  tdc[q].style('background-color',farbskala[Math.min(10,Math.round(tabellen_data[key][settim_slot][1])*2)]
+  //farbskala[Math.min(10,Math.round(tabellen_data[key][settim_slot][1]*2))]
   )
-  if(isNaN(graphdata[key].density[settim_slot])){tdc[q].text("")}
+  if(isNaN(tabellen_data[key][settim_slot][1])){tdc[q].text("")}
   pfeil =" ◄"
-  if(graphdata[key].tension[settim_slot]>graphdata[key].tension[settim_slot-1]){pfeil =" ▲" }
-  if(graphdata[key].tension[settim_slot]<graphdata[key].tension[settim_slot-1]){pfeil =" ▼" }
-  ttc[q].text(Math.round(graphdata[key].tension[settim_slot]) +pfeil)
-  ttc[q].style('background-color',farbskala[Math.round(graphdata[key].tension[settim_slot])])
+  if(tabellen_data[key][settim_slot][2]>graphdata[key][settim_slot-1][2]){pfeil =" ▲" }
+  if(tabellen_data[key][settim_slot][2]<graphdata[key][settim_slot-1][2]){pfeil =" ▼" }
+  ttc[q].text(Math.round(tabellen_data[key][settim_slot][2]) +pfeil)
+  ttc[q].style('background-color',farbskala[Math.round(tabellen_data[key][settim_slot][2])])
 
-  tpc[q].text(Math.round((graphdata[key].usage[settim_slot]*stages_list[q].capacity)/100).toLocaleString('en-US'))
-  if(isNaN(graphdata[key].usage[settim_slot]*stages_list[q].capacity)/100){tpc[q].text("")}
+  tpc[q].text(Math.round((graphdata[key][settim_slot])).toLocaleString('en-US'))
+  //if(isNaN(graphdata[key][settim_slot]*stages_list[q].capacity)/100){tpc[q].text("")}
 
-  if(isNaN(graphdata[key].tension[settim_slot])){ttc[q].text("")}
+  //if(isNaN(tabellen_data[key][settim_slot][2])){ttc[q].text("")}
   // tpc[q].style('background-color',farbskala[Math.round(graphdata[key].usage[settim_slot]/15)])
   q++
+
   }})
 
   /*
@@ -575,135 +759,7 @@ if(key != "Playground")
   //field_rate.text(scan_rate.toLocaleString('en-US'))
 
 
-  onsite_cur2 = Math.ceil((onsite_cur/100000)*100/20)
-
-  //  onsite.setStyle({fillColor: farbskala[onsite_cur2]})
-  field_site.text(onsite_cur.toLocaleString('en-US')).style('background-color',farbskala[onsite_cur2])
-  // Zeitanzeige aktualisieren
-  ttt = "x"
-  if (settim.getDate()==26){ttt = 1}
-  if (settim.getDate()==27){ttt = 2}
-  if (settim.getDate()==28){ttt = 3}
-  if (settim.getDate()==29){ttt = 4}
-  rr1=""
-  rr2 =""
-  if (settim.getHours()<10){rr1="0"}
-  if (settim.getMinutes()<10){rr2="0"}
-
-
-
-  aa = settim.getTime()
-
-
-
-
-  //rechnen()
-  data=[]
-
-  data.push(
-  {
-  x:  graphdata[selected_area.name].zeit, //neu graph_data[selected_area.id].data_time,
-  y:  graphdata[selected_area.name].usage, //neu graph_data[selected_area.id].data,
-  yaxis:"y1",
-  mode: 'lines',
-  fill: 'tonexty',
-  name: selected_area.name,
-  line: {shape: 'spline'},
-  type: 'scatter'  
-  })
-  initialise_chart(data)*/
-  // update_map();
-  // update_table()
-
-  data=[]
-  /*
-  tempa = new Date()
-  tempa = tempa.getTime()
-  tempb = tempa +(60*60*1000)
-  temper = addArrays(count_data.IN,count_data.OUT)
-  steigung = (temper [settim_slot]-temper[settim_slot-1])      
-
-  //(graph_data[selected_area.name].data[settim_slot-ruckschau]-graph_data[selected_area].data[settim_slot])/ruckschau
-  gr_layout.shapes.push(  {
-  type: 'line',
-  x0: settim,
-  y0: temper[settim_slot],
-  x1: temp,
-  y1: temper[settim_slot]-(steigung*4),//*ruckschau,
-  line: {
-  color: "black",
-  dash: 'dashdot',
-  width: 1
-  }} )
-
-  */
-  data.push(
-  { x: count_data.zeit,
-  y: addArrays(count_data.IN,count_data.OUT),
-  mode: 'lines',
-
-  name: "crowd count total",
-  line: {shape: 'spline',color:"green"},
-  type: 'scatter'    }
-  )
-
-  
-  filteredData= {zeit: total_people.zeit.slice(0, settim_slot + 1),usage: total_people.usage.slice(0, settim_slot + 1), }
- console.log(total_people)
-
-
-  data.push(
-
-
-
-  {
-  x:  filteredData.zeit, //neu graph_data[selected_area.id].data_time,
-  y:  filteredData.usage, //neu graph_data[selected_area.id].data,
-
-  yaxis:"y1",
-  mode: 'lines',   fill: 'tozeroy',
-
-  name: "count on site",
-  line: {shape: 'spline',color: "steelblue"},
-  type: 'scatter'  
-  })
-
-  data.push(
-    
-  {
-  x:  reference_data.zeit, //neu graph_data[selected_area.id].data_time,
-  y:  reference_data.sum, //neu graph_data[selected_area.id].data,
-
-  yaxis:"y1",
-
-
-  mode: 'lines',
-  name: "day 1 - 2024",
-  line: {shape: 'spline',color:"black",dash: 'dashdot'},
-  type: 'scatter'    })
-
-
-  data.push(
-    
-  {
-  x:  reference_data_day2.zeit, //neu graph_data[selected_area.id].data_time,
-  y:  reference_data_day2.sum, //neu graph_data[selected_area.id].data,
-
-  yaxis:"y1",
-
-
-  mode: 'lines',
-  name: "day 2 - 2024",
-  line: {shape: 'spline',color:"orange",dash: 'dashdot'},
-  type: 'scatter'    })
-  initialise_chart(data,"usage")     
-  }
-  d3.select("#timeslider").attr('max',graphbreiteinviertelstunden)
-  function nowbutton(){
-    settim = new Date()
-autoplay = false
-    refresh()
-
+*/
   }
   //// diese Funktion ist unter gleichem namen aber mit anderen funktionen in der report ansicht
   function select_area(set_area){
@@ -807,7 +863,7 @@ autoplay = false
     realtime = true
     refresh()
   
-}, 60000);
+}, 10000);
 
 
   function autplay_starten (){
