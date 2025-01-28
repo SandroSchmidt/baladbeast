@@ -116,7 +116,7 @@
 
 </td>
       <td>
-        <button id="swipemodebutton" onclick="swipemode = !swipemode; if(swipemode){d3.select('#swipemodebutton').text('map-zoom')}else{d3.select('#swipemodebutton').text('swipe-mode')};set_swipemode()">swipe-mode</button>
+        <button id="swipemodebutton" onclick="swipemode = !swipemode; if(swipemode){d3.select('#swipemodebutton').text('go to map-zoom')}else{d3.select('#swipemodebutton').text('go to swipe-mode')};set_swipemode()">swipe-mode</button>
         <button id="sendrepbut" style="margin-left:10%;padding-left: 5%;padding-right: 5%;" onclick="jetzt = new Date();writeReportToFirebase()"><b>send report</b></button>
         <span id="total_p">total on site: 0</span>
       </td>
@@ -142,6 +142,10 @@
 </body>
 
 <script>
+ setInterval(() => {
+   draw_arrow()
+  draw_marker()
+}, 10000);
 
 total_p = d3.select('#total_p')
 const storedName = localStorage.getItem('userName');
