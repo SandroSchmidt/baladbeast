@@ -96,30 +96,75 @@ function balad_plot_malen(data){
         name: key, // Legend name
         type: 'scatter', // Area chart type in Plotly
         mode: 'none',//'line',
+        hoverinfo: 'skip',
      //   line: {shape: 'spline'}, // No lines or markers, just filled areas
       };
     });
+    const ySums = xValues.map((_, index) => {
+    return Object.keys(data)
+      .filter((key) => key !== 'x') // Exclude the x-axis values
+      .reduce((sum, key) => sum + data[key][index], 0); // Sum all y values at the current x
+  });
 
+  // Add a trace for the sum line
+  const sumLineTrace = {
+    x: xValues,
+    y: ySums,
+    name: 'Total', // Name for the legend
+    type: 'scatter',
+    mode: 'lines', // Line mode
+    showlegend: false, 
+    line: {
+     // shape:"spline",
+      color: 'blue', // Line color
+      width: 2, // Line width
+      dash: 'solid', // Line style (e.g., dashed, dotted, solid)
+    },
+  };
+
+  // Add the sum line trace to the array of traces
+  traces.push(sumLineTrace);
+    traces[12].showlegend= false
     const currentTime = new Date()//.toISOString();
     console.log(currentTime)
   // Layout configuration
   const layout = {
-    margin:{t:0,b:20,r:0},
+    dragmode: false,
+    margin:{t:0,b:20,r:0,l:40},
    // title: 'Stacked Area Chart',
     xaxis: {
+      dtick: 3600000,         // 1 hour in milliseconds (for time data)
+    tickformat: '%H:%M', 
+    showgrid: true,   // Show gridlines for the x-axis
+    gridcolor: 'lightgray', // Gridline color
+    gridwidth: 0.5,     // Gridline width
+
+    showline: true,   // Add an axis line
+    linecolor: 'black', // Axis line color
+    linewidth: 2 ,     // Axis line width
+ 
+    
      // title: 'Timestamp',
       type: 'date', // Format x-axis as dates
     },
-    yaxis: {
-      range: [0,16000],
-      title: 'patrons on site',
+    yaxis: {showgrid: true,   // Show gridlines for the y-axis
+    gridcolor: 'lightgray', // Gridline color
+    gridwidth: 0.5,     // Gridline width
+
+    showline: true,   // Add an axis line
+    linecolor: 'black', // Axis line color
+    linewidth: 2 ,     // Axis line width
+  
+      range: [0,14000],
+   //   title: 'patrons on site',
     },
-    showlegend: false, // Show legend
-    legend: {
+    showlegend: true, // Show legend
+    
+    legend: { 
       x: 0,
       y: 1,
       xanchor: 'left',
-      yanchor: 'top',
+      yanchor: 'top', 
     },
     shapes: [
       {
@@ -565,8 +610,9 @@ Plotly.newPlot('liu_div', data,gr_layout,{
   // temp.append('td').text(i)
 if(stages_list[i].name != "Playground") 
 {  butarr.push( temp.append('td').text(stages_list[i].name)
-  .style("cursor", "pointer").style("font-weight",700) 
-        .on('click',  function(){ select_area(j)})  )
+  // .style("cursor", "pointer").style("font-weight",700) .on('click',  function(){ select_area(j)}) 
+       
+       )
 
   tuc.push(temp.append("td").text("u"+i).style("font-weight",700))
 

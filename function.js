@@ -680,7 +680,7 @@ for (f=0;f<hinter.length;f++)       {let fu = f;L.polygon(hinter[f].coords, {col
 //for (f=0;f<vib_arr.length;f++)      {let fu = f;L.polygon(vib_arr[f].coords,{fillColor: '#6e737a',fillOpacity:1,color:"black",weight:1}).bindTooltip(vib_arr[f].name).addTo(green_layer)}
 
 // Layercontroll
-for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "red",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
+for (f=0;f<blocking_arr.length;f++) {let fu = f; L.polygon(blocking_arr[f].coords, {fillColor: "black",color:"black", "weight": 1,"opacity": 1,fillOpacity:0.8}).bindTooltip(blocking_arr[f].name).addTo(green_layer)}
 mymap.addControl(new L.Control.Fullscreen());
     L.control.layers(
       {"CAD": imageOverlay,"dark":Jawg_Matrix ,"light": tl1,"sat":mapboxLayer },
@@ -775,6 +775,7 @@ stages_list[i].geo = f
 
 for(i=0;i<fluchtrouten.length;i++)
  { for(k=0;k<fluchtrouten[i].length;k++){fluchtrouten[i][k][0] -= 0.00005;fluchtrouten[i][k][1] -= 0.00055}// fluchtrouten[i][o][0] -= 0.00001}
+ 
 
 var polyline = L.polyline(fluchtrouten[i], {
   color: 'red',
