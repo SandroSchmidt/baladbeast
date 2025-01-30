@@ -66,7 +66,7 @@
 console.log("Current Date & Time: ", currentDate);
 
 // Add 1 hour
-currentDate.setHours(currentDate.getHours() + 1);
+currentDate.setHours(currentDate.getHours() + 3);
                 camcountarr.x.push(currentDate.toISOString())
                 camcountarr.y.push(parseInt(userNumber))
                 console.log(camcountarr)
@@ -178,8 +178,8 @@ let today = new Date(start_graphdata);
     tomorrow.setDate(today.getDate() + 1);
 
     // Define time range for x-axis
-    let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 0, 0).toISOString();  // Today 12:00 PM
-    let endTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 5, 0, 0).toISOString();  // Tomorrow 4:00 AM
+    let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 18, 0, 0).toISOString();  // Today 12:00 PM
+    let endTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 7, 0, 0).toISOString();  // Tomorrow 4:00 AM
 
   // Layout configuration
   const layout = {
