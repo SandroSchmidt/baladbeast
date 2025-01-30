@@ -55,6 +55,28 @@
 
   </body>
   <script>
+    d3.select('img').on('click',function(){
+            // Open a prompt asking for a number
+            let userNumber = prompt("Enter IN-counts at this time:");
+
+            // Check if user entered a valid number
+            if (!isNaN(userNumber) && userNumber !== null && userNumber.trim() !== '') {
+           //     display.textContent = `You entered: ${userNumber}`;
+           let currentDate = new Date();
+console.log("Current Date & Time: ", currentDate);
+
+// Add 1 hour
+currentDate.setHours(currentDate.getHours() + 1);
+                camcountarr.x.push(currentDate.toISOString())
+                camcountarr.y.push(parseInt(userNumber))
+                console.log(camcountarr)
+                databaseRef =database.ref('baladbeast/bb25aux/day' + heutag + '/incounts')
+                databaseRef.set(camcountarr)
+                balad_plot_malen(graphdata)  
+            } else {
+                display.textContent = "Invalid input. Please enter a valid number.";
+            }
+        })
     /*  Diese 4 Zeilen sind für den Fall, dass man das Bild im Hintergrund nochmal zerren muss, dazu sind die number.inputs aus einzukommentieren
   d3.select('#imgstr1').attr("value",imageBounds[0][0])
   d3.select('#imgstr2').attr("value",imageBounds[0][1])
@@ -122,17 +144,50 @@ function balad_plot_malen(data){
     },
   };
 
+
   // Add the sum line trace to the array of traces
   traces.push(sumLineTrace);
     traces[12].showlegend= false
+    traces[13   ].showlegend= false
+    traces[14].showlegend= false
+    traces[15].showlegend= false
     const currentTime = new Date()//.toISOString();
     console.log(currentTime)
+
+// add trace cam in
+
+   // Initial trace for the plot
+         intrace = {
+            x: camcountarr.x,
+            y: camcountarr.y,
+            mode: 'lines',
+            name: 'IN-counts',
+            line: {
+                shape: 'spline',
+                color: 'black',
+                width: 2
+            }}
+        
+
+traces.push(intrace)
+
+
+
+let today = new Date(start_graphdata);
+    let tomorrow = new Date(start_graphdata);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Define time range for x-axis
+    let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 13, 0, 0).toISOString();  // Today 12:00 PM
+    let endTime = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 5, 0, 0).toISOString();  // Tomorrow 4:00 AM
+
   // Layout configuration
   const layout = {
     dragmode: false,
     margin:{t:0,b:20,r:0,l:40},
    // title: 'Stacked Area Chart',
     xaxis: {
+      range: [startTime, endTime],
       dtick: 3600000,         // 1 hour in milliseconds (for time data)
     tickformat: '%H:%M', 
     showgrid: true,   // Show gridlines for the x-axis
@@ -605,7 +660,7 @@ Plotly.newPlot('liu_div', data,gr_layout,{
 
   // tabelle malen
 
-  for (i=0;i<stages_list.length;i++){let j =i
+  for (i=0;i<stages_list.length-3;i++){let j =i
   temp = tabero.append('tr')
   // temp.append('td').text(i)
 if(stages_list[i].name != "Playground") 
@@ -759,7 +814,7 @@ console.log(settim_slot)
 
 
   */
-if(key != "x")
+if(key != "x" && key !="GA"&& key !="ROSHAN approach"&& key !="OMDA approach")
 
 {
   if (Math.round(tabellen_data[key][settim_slot][0]) == NaN){alert(tabellen_data[key][settim_slot][0])}

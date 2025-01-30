@@ -45,6 +45,7 @@ for (const key in daydata){
     timeslot = daydata[key].zeit[o] - start_graphdata
     timeslot = Math.round(timeslot/(60*1000*5))
     graphdata[key][timeslot] = cap* daydata[key].usage[o]/100
+    console.log(daydata[key])
     tabellen_data[key][timeslot] = [daydata[key].usage[o],daydata[key].density[o],daydata[key].tension[o] ,(cap* daydata[key].usage[o]/100)]
   }
 }
@@ -284,6 +285,19 @@ database = firebase.database();
       console.log("No swipe-data available");
       }
     }); 
+
+
+    databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/incounts');
+    // Listen for changes in the database
+    databaseRef.on('value', (snapshot) => {
+    if (snapshot.exists()) {
+    camcountarr = snapshot.val();
+    
+    } else {
+    console.log("No in-data available");
+    }
+  }); 
+
 
 // reading own locations
               databaseRef = database.ref('baladbeast/bb25aux/day' + heutag + '/locations');
